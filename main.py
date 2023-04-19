@@ -5,7 +5,7 @@ import nltk
 import requests
 import random
 
-languages = ["en_US", "fa", "zh_hans"]
+languages = ["de"]
 
 ipas = []
 ipa_reverse = {}
@@ -19,7 +19,7 @@ for l in languages:
     len_before = len(ipas)
     for i in range(len(pairs)):
         if len(pairs[i]) == 2:
-            word = pairs[i][0]
+            word = pairs[i][0].strip()
 
             cleaned = pairs[i][1].replace("ˈ", "").replace("/", "").replace("ˌ", "")
             if "," in cleaned:
@@ -35,22 +35,33 @@ for l in languages:
 print("Some of the words and their origin languages:")
 random.shuffle(ipas)
 for i in ipas[:20]:
-    print(f"    {i}".ljust(20), ipa_reverse[i])
+    print(f"    '{i}'".ljust(60), f"'{ipa_reverse[i]}'")
 
+
+def invertDict(d):
+    return {v: k for k, v in d.items()}
 
 
 # =======================
 #   GENERATION METHODS
 # =======================
 
-def switchVoicing(segment):
-    voicing_pairs = {
-        "s" : "z",
-        "t" : "d",
-        "ʃ" : "ʒ",
-        "f" : "v"
-    }
+# ZH: g->k
+# DE:
+#       g->g
+#       (a, o:, u:, a: , )g# -> X
+#       (I E, e: , i: , ae, )g# -> ç
 
+devoice_dict = {
+    "z" : "s",
+    "d" : "t",
+    "ʒ" : "ʃ",
+    "v" : "f",
+    "b" : "p",
+    "g" : "k",
+}
+
+def devoice(segment):
     for v in list(voicing_pairs.keys()):
         voicing_pairs[voicing_pairs[v]] = v
 
